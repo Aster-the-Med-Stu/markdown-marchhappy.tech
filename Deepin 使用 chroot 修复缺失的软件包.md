@@ -1,6 +1,6 @@
 > 本文使用百度在线输入法写作而成，因为 Deepin 的 ISO 没有搜狗拼音……
 
-purge一时爽，系统火葬场（X
+*** purge一时爽，系统火葬场（X ***
 
 我自己使用的台式机使用的为一套古老的 3A 平台（08年的速龙II X4 640，15年的 R7 360，以及970芯片组），但为了在同学的电脑流畅的使用 Deepin ，我使用了 Deepin 的显卡驱动管理器安装了大黄蜂方案的显卡驱动。早就在 LUG@USTC 听说过老黄的显卡驱动，只要内核升级就会随机 BOOM ，结果没想到这样的事情真的发生到了自己头上。
 
@@ -40,9 +40,13 @@ root@Deepin:/# fish
 Welcome to fish, the friendly interactive shell
 <W> fish: An error occurred while redirecting file “/dev/null”
 open: Permission denied
-root@Deepin /# exit
 ```
-
+不知为何，chroot 以后提示挂载 /dev/null 失败。检查以后发现 /dev/null 下面神奇的冒出了文件，于是直接 G9 滥权删除。
+```
+root@Deepin:/# rm /dev/null
+root@Deepin:/# mknod /dev/null c 1 3
+root@Deepin:/# chmod 666 /dev/null
+```
 # chroot 后无法联网的解决
 
 ```
@@ -92,6 +96,7 @@ W: Failed to fetch http://linux.teamviewer.com/deb/dists/stable/InRelease  Tempo
 W: Failed to fetch http://linux.teamviewer.com/deb/dists/preview/InRelease  Temporary failure resolving 'linux.teamviewer.com'
 W: Some index files failed to download. They have been ignored, or old ones used instead.
 ```
+很奇特的连不上网络
 ```
 root@Deepin:/# ping -c marchhappy.tech
 ping: bad number of packets to transmit.
@@ -110,14 +115,14 @@ root@Deepin:/# ping -c 2 marchhappy.tech
 ping: marchhappy.tech: Temporary failure in name resolution
 root@Deepin:/#
 ```
-一直提示“暂时无法解析域名”，而且 chroot 环境下是没有办法用上systemctl
+一直提示“暂时无法解析域名”，而且 chroot 环境下是没有办法用上systemctl，最后发现是 DNS 解析未设置（感谢 Telegram群组 [桌面Linux](https://t.me/LinuxDesktop) 某位同学指定～）
 ```
 root@Deepin /# nano /etc/dnsmasq.conf
 ```
+填入国科大的 DNS
 # 恢复误删除的软件包
-选中括号内的内容的正则表达式：```(\([^\)]+\))```
-# 乱删掉的软件包列表
-
+## 乱删掉的软件包列表
+从 ```/var/log/apt/history.log``` 弄出来的列表
 ```
 Start-Date: 2018-01-30  20:20:07
 Commandline: apt-get remove --purge nvidia-*
@@ -125,7 +130,13 @@ Requested-By: aster (1000)
 Purge: xserver-xorg-input-all:amd64 (1:7.7+19), xserver-xorg-input-synaptics:amd64 (1.9.0-3deepin), xserver-xorg:amd64 (1:7.7+19), xserver-xorg-video-vesa:amd64 (1:2.3.4-1+b2), libglx0-glvnd-nvidia:amd64 (387.34-1deepin), libglx0-glvnd-nvidia:i386 (387.34-1deepin), nvidia-support:amd64 (20151021+4), xserver-xorg-video-amdgpu:amd64 (1.3.0-1), libgles-nvidia1:amd64 (387.34-1deepin), libgles-nvidia1:i386 (387.34-1deepin), libgles-nvidia2:amd64 (387.34-1deepin), libgles-nvidia2:i386 (387.34-1deepin), nvidia-kernel-common:amd64 (20151021+4), libnvidia-ml1:amd64 (387.34-1deepin), nvidia-vulkan-icd:amd64 (387.34-1deepin), nvidia-vulkan-icd:i386 (387.34-1deepin), nvidia-driver-libs-i386:i386 (387.34-1deepin), xserver-xorg-core:amd64 (2:1.19.3-2deepin), nvidia-egl-icd:amd64 (387.34-1deepin), nvidia-egl-icd:i386 (387.34-1deepin), update-glx:amd64 (0.7.2+deepin2), nvidia-driver:amd64 (387.34-1deepin), nvidia-modprobe:amd64 (375.26-1), bumblebee-nvidia:amd64 (3.2.1-13), xserver-xorg-video-fbdev:amd64 (1:0.4.4-1+b5), nvidia-vulkan-common:amd64 (387.34-1deepin), primus:amd64 (0~20150328-4), xserver-xorg-input-libinput:amd64 (0.23.0-2), nvidia-vdpau-driver:amd64 (387.34-1deepin), libgl1-nvidia-glvnd-glx:amd64 (387.34-1deepin), libgl1-nvidia-glvnd-glx:i386 (387.34-1deepin), libglx-nvidia0:amd64 (387.34-1deepin), libglx-nvidia0:i386 (387.34-1deepin), glx-alternative-nvidia:amd64 (0.7.2+deepin2), xserver-xorg-input-wacom:amd64 (0.34.0-1), nvidia-kernel-dkms:amd64 (387.34-1deepin), libegl-nvidia0:amd64 (387.34-1deepin), libegl-nvidia0:i386 (387.34-1deepin), nvidia-egl-common:amd64 (387.34-1deepin), libgles1-glvnd-nvidia:amd64 (387.34-1deepin), libgles1-glvnd-nvidia:i386 (387.34-1deepin), libnvidia-cfg1:amd64 (387.34-1deepin), libnvidia-cfg1:i386 (387.34-1deepin), nvidia-legacy-check:amd64 (387.34-1deepin), nvidia-egl-wayland-icd:amd64 (387.34-1deepin), nvidia-egl-wayland-icd:i386 (387.34-1deepin), xserver-xorg-video-intel:amd64 (2:2.99.917+git20161206-1+deepin), nvidia-kernel-support:amd64 (387.34-1deepin), glx-diversions:amd64 (0.7.2+deepin2), xserver-xorg-video-vmware:amd64 (1:13.2.1-1+b1), nvidia-driver-libs:amd64 (387.34-1deepin), nvidia-driver-libs:i386 (387.34-1deepin), nvidia-driver-bin:amd64 (387.34-1deepin), xserver-xorg-video-ati:amd64 (1:7.9.0-1), xorg:amd64 (1:7.7+19), nvidia-persistenced:amd64 (375.26-2), xserver-xorg-video-radeon:amd64 (1:7.9.0-1), xserver-xorg-video-nvidia:amd64 (387.34-1deepin), bumblebee:amd64 (3.2.1-13), nvidia-installer-cleanup:amd64 (20151021+4), libgl1-glvnd-nvidia-glx:amd64 (387.34-1deepin), libgl1-glvnd-nvidia-glx:i386 (387.34-1deepin), glx-alternative-mesa:amd64 (0.7.2+deepin2), nvidia-egl-wayland-common:amd64 (387.34-1deepin), libegl1-glvnd-nvidia:amd64 (387.34-1deepin), libegl1-glvnd-nvidia:i386 (387.34-1deepin), libgles2-glvnd-nvidia:amd64 (387.34-1deepin), libgles2-glvnd-nvidia:i386 (387.34-1deepin), nvidia-settings:amd64 (), nvidia-alternative:amd64 (387.34-1deepin)
 End-Date: 2018-01-30  20:20:52
 ```
+但是 ```apt``` 安装的时候需要去掉括号以及括号内内容，并且用空格代替逗号
 
+选中括号内的内容（含括号）的正则表达式：```(\([^\)]+\))```，随后再用空格替换逗号。最后用
+
+# 总结
+
+在 Deepin 之前使用的操作系统是 openSUSE leap 42 ，由于 ```BtrFS``` 的快照特性，所以出错的时候也懒得寻找问题所在，而是直接回滚快照。
 # 参考资料
 [1] [记一次错误卸载软件包导致Linux系统崩溃的修复解决过程](https://segmentfault.com/a/1190000000749515)
 
