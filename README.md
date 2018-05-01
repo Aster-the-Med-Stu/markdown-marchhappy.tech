@@ -1,5 +1,4 @@
 # markdown-marchhappy.tech
 Markdowns and media files for https://marchhappy.tech
 
-![](http://latex.codecogs.com/gif.latex?\\ Bigg\lVert\bigg\lVert\Big\lVert\big\lVert\lVert x
-\rVert\big\rVert\Big\rVert\bigg\rVert\Bigg\rVert \})
+![](http://latex.codecogs.com/gif.latex?\\x=\frac{-b\pm \sqrt{b^2-4ac}}{2a})
